@@ -1,0 +1,8 @@
+Type: project
+Package: automog_pen
+Version: 1.0.0
+Imports:
+    httr2,
+    knitr,
+    rvest
+License: MIT
