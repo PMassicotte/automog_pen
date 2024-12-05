@@ -1,4 +1,5 @@
 name: run.yml
+
 on:
   workflow_dispatch:
   # Run every 3 hours at 15 minutes past the hour
@@ -12,31 +13,35 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
       - name: Set lowercase environment variables
         run: |
           echo "REPO_OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
           echo "REPO_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "IMAGE_NAME=ghcr.io/${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}:latest" >> $GITHUB_ENV
 
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up container
+      - name: Login to Docker registry
         run: |
-          echo "IMAGE_NAME=ghcr.io/${{ env.REPO_NAME }}:latest" >> $GITHUB_ENV
+          docker login ghcr.io -u "${{ github.actor | toLowerCase }}" -p "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Run in Docker container
+      - name: Run scraper in Docker container
         run: |
-          docker login ghcr.io -u "${{ github.actor }}" -p "${{ secrets.GITHUB_TOKEN }}"
           docker run --rm -v "$GITHUB_WORKSPACE":/app ${{ env.IMAGE_NAME }} Rscript /app/scrape.R
 
-      - run: |
+      - name: Configure Git safe directory
+        run: |
           git config --global --add safe.directory $GITHUB_WORKSPACE
 
       - name: Create commit message
         id: commit_message_step
         run: |
-          echo "commit_message=https://github.com/${{ env.REPO_NAME }}/actions/runs/$GITHUB_RUN_ID" >> $GITHUB_OUTPUT
+          echo "commit_message=https://github.com/${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}/actions/runs/$GITHUB_RUN_ID" >> $GITHUB_OUTPUT
 
-      - uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: ${{ steps.commit_message_step.outputs.commit_message }}
