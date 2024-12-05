@@ -15,6 +15,10 @@ if (available != "Sold out") {
   request("https://ntfy.sh/") |>
     req_url_path("autmog_alert") |>
     req_body_raw(msg) |>
-    req_headers(Title = "Update at Weston Lambert", Click = url) |>
+    req_headers(
+      Title = "Autmog pen available",
+      Click = url,
+      Email = "pmassicotte@hotmail.com"
+    ) |>
     req_perform()
 }
