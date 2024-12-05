@@ -33,7 +33,7 @@ jobs:
 
       - name: Run scraper in Docker container
         run: |
-          docker run --rm -v "$GITHUB_WORKSPACE":/app ghcr.io/${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}:latest Rscript /app/scrape.R
+          docker run --rm -v "$GITHUB_WORKSPACE":/app ghcr.io/${{ github.repository_owner }}/${{ env.REPO_NAME }}:latest Rscript /app/scrape.R
 
       - name: Configure Git safe directory
         run: |
