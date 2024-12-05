@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set Lowercase Repository
+        run: echo "REPO=${{ github.repository_owner }}/automog_pen" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
