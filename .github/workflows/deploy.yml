@@ -14,17 +14,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
       - name: Build
         uses: docker/build-push-action@v6
         with:
@@ -32,10 +29,11 @@ jobs:
           push: true
           target: prod
           tags: ghcr.io/pmassicotte/automog_pen:latest
-          labels: org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository | toLowerCase() }}
+          labels: org.opencontainers.image.source=${{ github.server_url }}/pmassicotte/automog_pen
+          secret-envs: CODECOV_TOKEN=CODECOV_TOKEN
           build-args: |
             GITHUB_SHA=${{ github.sha }}
-            GITHUB_REPOSITORY=${{ github.repository | toLowerCase() }}
+            GITHUB_REPOSITORY=pmassicotte/automog_pen
             GITHUB_REF_NAME=${{ github.ref_name }}
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
