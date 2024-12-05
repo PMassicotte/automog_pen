@@ -17,16 +17,19 @@ jobs:
     steps:
       - name: Set lowercase environment variables
         run: |
-          echo "REPO_OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-          echo "REPO_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-          echo "IMAGE_NAME=ghcr.io/${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}:latest" >> $GITHUB_ENV
+          REPO_OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')
+          REPO_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME="ghcr.io/${REPO_OWNER}/${REPO_NAME}:latest"
+          echo "REPO_OWNER=${REPO_OWNER}" >> $GITHUB_ENV
+          echo "REPO_NAME=${REPO_NAME}" >> $GITHUB_ENV
+          echo "IMAGE_NAME=${IMAGE_NAME}" >> $GITHUB_ENV
 
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Login to Docker registry
         run: |
-          docker login ghcr.io -u "${{ github.actor | toLowerCase }}" -p "${{ secrets.GITHUB_TOKEN }}"
+          docker login ghcr.io -u "${{ github.actor }}" -p "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Run scraper in Docker container
         run: |
