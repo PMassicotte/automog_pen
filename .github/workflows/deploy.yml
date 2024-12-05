@@ -12,6 +12,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: set lower case owner name
+        run: |
+          echo "OWNER_LC=${OWNER,,}" >>${GITHUB_ENV}
+        env:
+          OWNER: "${{ github.repository_owner }}"
       - name: Checkout
         uses: actions/checkout@v4
       - name: Login to GitHub Container Registry
@@ -23,17 +28,18 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Build
-        uses: docker/build-push-action@v6
-        with:
-          platforms: linux/amd64
-          push: true
-          target: prod
-          tags: ghcr.io/pmassicotte/automog_pen:latest
-          labels: org.opencontainers.image.source=${{ github.server_url }}/pmassicotte/automog_pen
-          secret-envs: CODECOV_TOKEN=CODECOV_TOKEN
-          build-args: |
-            GITHUB_SHA=${{ github.sha }}
-            GITHUB_REPOSITORY=pmassicotte/automog_pen
-            GITHUB_REF_NAME=${{ github.ref_name }}
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      uses: docker/build-push-action@v6
+      with:
+        platforms: linux/amd64
+        push: true
+        target: prod
+        tags: ghcr.io/${{OWNER_LC}}:latest
+        labels: org.opencontainers.image.source=${{ github.server_url }}/${{ OWNER_LC }}
+        secret-envs:
+          CODECOV_TOKEN=CODECOV_TOKEN
+        build-args: |
+          GITHUB_SHA=${{ github.sha }}
+          GITHUB_REPOSITORY=${{ github.repository }}
+          GITHUB_REF_NAME=${{ github.ref_name }}
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
