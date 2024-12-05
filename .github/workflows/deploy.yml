@@ -29,7 +29,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64
-          push: true
+          push: false
           target: prod
           tags: ghcr.io/pmassicotte/automog_pen:latest
           labels: org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository | toLowerCase() }}
