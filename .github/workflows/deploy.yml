@@ -34,7 +34,7 @@ jobs:
           push: true
           target: prod
           tags: ghcr.io/pmassicotte/automog_pen:latest
-          labels: org.opencontainers.image.source=${{ github.server_url }}/${{ env.OWNER_LC }}
+          labels: org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository_owner,, }}
           secret-envs: CODECOV_TOKEN=CODECOV_TOKEN
           build-args: |
             GITHUB_SHA=${{ github.sha }}
