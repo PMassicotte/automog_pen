@@ -30,7 +30,7 @@ jobs:
           platforms: linux/amd64
           push: true
           target: prod
-          tags: ghcr.io/${{ github.repository }}:latest
+          tags: ghcr.io/${{ env.REPO }}:latest
           labels: org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
           secret-envs: CODECOV_TOKEN=CODECOV_TOKEN
           build-args: |
