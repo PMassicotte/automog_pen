@@ -34,7 +34,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64
-          push: false
+          push: true
           target: prod
           tags: ghcr.io/${{ env.REPO_OWNER }}/automog_pen:latest
           labels: org.opencontainers.image.source=${{ github.server_url }}/${{ env.REPO_NAME }}
