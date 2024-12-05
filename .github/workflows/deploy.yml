@@ -31,8 +31,8 @@ jobs:
           platforms: linux/amd64
           push: true
           target: prod
-          tags: ghcr.io/${{ github.repository_owner | toLowerCase() }}/automog_pen:latest
-          labels: org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository | toLowerCase() }}
+          tags: ghcr.io/pmassicotte/automog_pen:latest
+          labels: org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
           build-args: |
             GITHUB_SHA=${{ github.sha }}
             GITHUB_REPOSITORY=${{ github.repository | toLowerCase() }}
