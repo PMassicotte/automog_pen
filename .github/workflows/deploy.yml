@@ -33,7 +33,7 @@ jobs:
           platforms: linux/amd64
           push: true
           target: prod
-          tags: ghcr.io/${{ env.OWNER_LC }}:latest
+          tags: ghcr.io/pmassicotte/automog_pen:latest
           labels: org.opencontainers.image.source=${{ github.server_url }}/${{ env.OWNER_LC }}
           secret-envs: CODECOV_TOKEN=CODECOV_TOKEN
           build-args: |
