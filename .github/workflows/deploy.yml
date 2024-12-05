@@ -14,28 +14,29 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set Lowercase Repository
-        run: echo "REPO=${{ github.repository_owner }}/automog_pen" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
       - name: Build
-        uses: docker/build-push-action@v6
-        with:
-          platforms: linux/amd64
-          push: true
-          target: prod
-          tags: ghcr.io/${{ env.REPO }}:latest
-          labels: org.opencontainers.image.source=${{ github.server_url }}/${{ env.REPO }}
-          secret-envs: CODECOV_TOKEN=CODECOV_TOKEN
-          build-args: |
-            GITHUB_SHA=${{ github.sha }}
-            GITHUB_REPOSITORY=${{ env.REPO }}
-            GITHUB_REF_NAME=${{ github.ref_name }}
+        run: |
+          REPO="ghcr.io/$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')/automog_pen:latest"
+          docker buildx build \
+            --platform linux/amd64 \
+            --push \
+            --target prod \
+            --tag $REPO \
+            --label "org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}" \
+            --build-arg GITHUB_SHA=${{ github.sha }} \
+            --build-arg GITHUB_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]') \
+            --build-arg GITHUB_REF_NAME=${{ github.ref_name }} \
+            --secret id=CODECOV_TOKEN,env=CODECOV_TOKEN
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
