@@ -32,7 +32,7 @@ jobs:
           push: true
           target: prod
           tags: ghcr.io/pmassicotte/automog_pen:latest
-          labels: org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          labels: org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository | toLowerCase() }}
           build-args: |
             GITHUB_SHA=${{ github.sha }}
             GITHUB_REPOSITORY=${{ github.repository | toLowerCase() }}
