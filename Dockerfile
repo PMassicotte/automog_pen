@@ -1,6 +1,3 @@
-# syntax=docker/dockerfile:1.7-labs
-# ^^^ needed for COPY --exclude
-
 # This is the SHA of a multi-arch manifest, so it'll use the native
 # container on amd64 / arm64.
 ARG BASE=ghcr.io/r-lib/rig/ubuntu-22.04-release@sha256:1dc2de2cf32dd10945a4ed3714ae35e73b01e1ea47f458c3e9dc82eef016a3e2
