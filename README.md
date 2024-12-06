@@ -1,1 +1,1 @@
-Based/copier from: https://github.com/hadley/available-work
+Based/copied from: https://github.com/hadley/available-work
