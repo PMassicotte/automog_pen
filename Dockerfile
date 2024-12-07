@@ -40,20 +40,6 @@ RUN if [ -d tests ]; then \
     R -q -e 'covr::to_cobertura(print(covr::package_coverage()))'; \
     fi
 
-ARG GITHUB_SHA
-ARG GITHUB_REPOSITORY
-ARG GITHUB_REF_NAME
-RUN --mount=type=secret,id=CODECOV_TOKEN \
-    if [ -d tests ] && [ -f /run/secrets/CODECOV_TOKEN ]; then \
-    apt-get update && apt-get install -y git && \
-    R -q -e 'download.file("https://cli.codecov.io/latest/linux/codecov", "/usr/local/bin/codecov")' && \
-    chmod +x /usr/local/bin/codecov && \
-    codecov upload-process --disable-search -f cobertura.xml --plugin noop \
-    --git-service github --token `cat /run/secrets/CODECOV_TOKEN` \
-    --sha ${GITHUB_SHA} --slug ${GITHUB_REPOSITORY} \
-    --branch ${GITHUB_REF_NAME}; \
-    fi
-
 # -------------------------------------------------------------------------
 # production stage, this is deployed. Has the extra stuff only needed
 # for deployment
@@ -63,28 +49,3 @@ COPY --from=test /tmp/dummy* /tmp/
 
 # copy everything, except the tests
 COPY --exclude=tests . /app
-
-# tools neeed for prod
-RUN apt-get update && \
-    apt-get install -y git rsync && \
-    apt-get clean
-
-# -------------------------------------------------------------------------
-# for development. This is the default, so devcontainers run this.
-# it has the test-deps, plus stuff only needed for development
-# -------------------------------------------------------------------------
-FROM test-deps AS dev
-
-RUN R -q -e 'pak::pkg_install(c("devtools", "usethis", "profvis"))'
-RUN R -q -e 'pak::pkg_install("languageserver")'
-
-RUN apt-get update && \
-    apt-get install -y openssh-server && \
-    apt-get clean
-
-RUN echo PermitRootLogin yes >> /etc/ssh/sshd_config && \
-    echo PermitEmptyPasswords yes >> /etc/ssh/sshd_config && \
-    echo Port 2222 >> /etc/ssh/sshd_config && \
-    passwd -d root
-
-RUN git config --global --add safe.directory '/workspaces/*'
