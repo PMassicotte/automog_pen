@@ -28,7 +28,7 @@ RUN R -q -e 'pak::pkg_install("deps::.", dependencies = TRUE)'; \
     rm -rf DESCRIPTION /tmp/*
 
 # -------------------------------------------------------------------------
-# This stage actually runs the tests
+# This stage actually runs the tests + test coverage
 # -------------------------------------------------------------------------
 FROM test-deps AS test
 
@@ -37,6 +37,21 @@ WORKDIR /app
 
 RUN if [ -d tests ]; then \
     R -q -e 'testthat::test_local()'; \
+    R -q -e 'covr::to_cobertura(print(covr::package_coverage()))'; \
+    fi
+
+ARG GITHUB_SHA
+ARG GITHUB_REPOSITORY
+ARG GITHUB_REF_NAME
+RUN --mount=type=secret,id=CODECOV_TOKEN \
+    if [ -d tests ] && [ -f /run/secrets/CODECOV_TOKEN ]; then \
+    apt-get update && apt-get install -y git && \
+    R -q -e 'download.file("https://cli.codecov.io/latest/linux/codecov", "/usr/local/bin/codecov")' && \
+    chmod +x /usr/local/bin/codecov && \
+    codecov upload-process --disable-search -f cobertura.xml --plugin noop \
+    --git-service github --token `cat /run/secrets/CODECOV_TOKEN` \
+    --sha ${GITHUB_SHA} --slug ${GITHUB_REPOSITORY} \
+    --branch ${GITHUB_REF_NAME}; \
     fi
 
 # -------------------------------------------------------------------------
@@ -49,7 +64,7 @@ COPY --from=test /tmp/dummy* /tmp/
 # copy everything, except the tests
 COPY --exclude=tests . /app
 
-# tools needed for prod
+# tools neeed for prod
 RUN apt-get update && \
     apt-get install -y git rsync && \
     apt-get clean
